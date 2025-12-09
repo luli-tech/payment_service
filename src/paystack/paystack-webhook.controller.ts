@@ -30,8 +30,8 @@ export class PaystackWebhookController {
     const event = payload?.event;
 
     if (event === 'charge.success') {
-      const reference = payload?.data?.reference;
-      const amount = payload?.data?.amount;
+      const reference: string = String(payload?.data?.reference);
+      const amount: number = Number(payload?.data?.amount);
 
       if (!reference || isNaN(amount)) {
         throw new BadRequestException('Invalid payload data');
