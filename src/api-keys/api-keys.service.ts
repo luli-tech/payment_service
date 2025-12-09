@@ -28,7 +28,7 @@ export class ApiKeysService {
   }
 
   async create(createApiKeyDto: CreateApiKeyDto) {
-    const { name, permissions, expiry, userId } = createApiKeyDto as any;
+    const { name, permissions, expiry, userId } = createApiKeyDto as unknown as CreateApiKeyDto & { userId: string };
     // Enforce max 5 active keys per user
     const activeCount = await this.prisma.apiKey.count({
       where: { userId, revoked: false, expiresAt: { gt: new Date() } },
@@ -55,6 +55,7 @@ export class ApiKeysService {
   }
 
   async update(id: string, updateApiKeyDto: UpdateApiKeyDto) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return this.prisma.apiKey.update({ where: { id }, data: updateApiKeyDto as any });
   }
 

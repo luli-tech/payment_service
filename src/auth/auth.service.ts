@@ -14,7 +14,7 @@ export class AuthService {
       return 'No user from google';
     }
 
-    let user = await this.usersService.findByEmail(req.user.email);
+    let user = await this.usersService.findByEmail(req.user.email as string);
 
     if (!user) {
       user = await this.usersService.create({

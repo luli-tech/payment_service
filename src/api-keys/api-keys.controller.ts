@@ -21,7 +21,8 @@ export class ApiKeysController {
   @ApiResponse({ status: 400, description: 'Bad Request. Limit reached or invalid input.' })
   @ApiResponse({ status: 401, description: 'Unauthorized. User not authenticated.' })
   create(@Req() req, @Body() createApiKeyDto: CreateApiKeyDto) {
-    const userId = req.user.sub;
+    const userId = (req as any).user.sub;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     return this.apiKeysService.create({ ...createApiKeyDto, userId } as any);
   }
 

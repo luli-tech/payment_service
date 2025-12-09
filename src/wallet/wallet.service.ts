@@ -13,7 +13,7 @@ export class WalletService {
 
   // Create a wallet for a user (if not exists)
   async create(createWalletDto: CreateWalletDto) {
-    const { userId } = createWalletDto as any; // expecting userId field
+    const { userId } = createWalletDto as unknown as { userId: string }; // expecting userId field
     const existing = await this.prisma.wallet.findUnique({ where: { userId } });
     if (existing) {
       throw new BadRequestException('Wallet already exists for this user');
@@ -67,6 +67,7 @@ export class WalletService {
       }),
     ]);
     // Record transaction
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await this.transactionsService.create({
       userId: senderUserId,
       type: 'TRANSFER',
@@ -87,6 +88,7 @@ export class WalletService {
   async update(id: string, updateWalletDto: UpdateWalletDto) {
     return this.prisma.wallet.update({
       where: { id },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       data: updateWalletDto as any,
     });
   }

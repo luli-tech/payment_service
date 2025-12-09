@@ -33,7 +33,7 @@ export class WalletController {
   @ApiResponse({ status: 403, description: 'Forbidden. API Key missing DEPOSIT permission.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error. Paystack initialization failed.' })
   async deposit(@Req() req, @Body() dto: CreatePaystackDto) {
-    const userId = req.user?.sub || req.apiKey?.userId;
+    const userId = (req.user?.sub || req.apiKey?.userId) as string;
     const payload = { ...dto, userId };
     return this.paystackService.initialize(payload);
   }
@@ -50,7 +50,7 @@ export class WalletController {
   @ApiResponse({ status: 404, description: 'Wallet not found for user.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   getBalance(@Req() req) {
-    const userId = req.user?.sub || req.apiKey?.userId;
+    const userId = (req.user?.sub || req.apiKey?.userId) as string;
     return this.walletService.getBalance(userId);
   }
 
@@ -65,7 +65,7 @@ export class WalletController {
   @ApiResponse({ status: 403, description: 'Forbidden. API Key missing READ permission.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   getTransactions(@Req() req) {
-    const userId = req.user?.sub || req.apiKey?.userId;
+    const userId = (req.user?.sub || req.apiKey?.userId) as string;
     return this.walletService.getTransactions(userId);
   }
 
@@ -82,7 +82,7 @@ export class WalletController {
   @ApiResponse({ status: 404, description: 'Recipient wallet not found.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error. Transaction failed.' })
   transfer(@Req() req, @Body() transferDto: TransferDto) {
-    const senderUserId = req.user?.sub || req.apiKey?.userId;
+    const senderUserId = (req.user?.sub || req.apiKey?.userId) as string;
     const { recipientWalletId, amount } = transferDto;
     return this.walletService.transfer(senderUserId, recipientWalletId, amount);
   }
@@ -96,7 +96,7 @@ export class WalletController {
   @ApiResponse({ status: 400, description: 'Bad Request. User already has a wallet.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   create(@Req() req, @Body() createWalletDto: CreateWalletDto) {
-      const userId = req.user?.sub || req.apiKey?.userId;
+      const userId = (req.user?.sub || req.apiKey?.userId) as string;
       return this.walletService.create({ ...createWalletDto, userId });
   }
 
