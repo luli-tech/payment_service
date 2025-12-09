@@ -25,8 +25,8 @@ export class WalletService {
     return this.prisma.wallet.findMany();
   }
 
-  async findOne(id: number) {
-    const wallet = await this.prisma.wallet.findUnique({ where: { id: id.toString() } });
+  async findOne(id: string) {
+    const wallet = await this.prisma.wallet.findUnique({ where: { id } });
     if (!wallet) {
       throw new NotFoundException('Wallet not found');
     }
@@ -84,14 +84,14 @@ export class WalletService {
     return this.transactionsService.findByUser(userId);
   }
 
-  async update(id: number, updateWalletDto: UpdateWalletDto) {
+  async update(id: string, updateWalletDto: UpdateWalletDto) {
     return this.prisma.wallet.update({
-      where: { id: id.toString() },
+      where: { id },
       data: updateWalletDto as any,
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.wallet.delete({ where: { id: id.toString() } });
+  async remove(id: string) {
+    return this.prisma.wallet.delete({ where: { id } });
   }
 }

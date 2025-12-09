@@ -5,6 +5,13 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS for frontend requests
+  app.enableCors({
+    origin: ['http://localhost:3000'], // your frontend URLs
+    credentials: true,
+  });
+
+  // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('Payment System API')
     .setDescription('API documentation for the Wallet Payment System')
@@ -12,10 +19,15 @@ async function bootstrap() {
     .addBearerAuth()
     .addApiKey({ type: 'apiKey', name: 'x-api-key', in: 'header' }, 'x-api-key')
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = process.env.PORT ?? 3000;
+  await app.listen(port);
+
+  console.log(`🚀 Server is running on: http://localhost:${port}`);
+  console.log(`📄 Swagger docs available at: http://localhost:${port}/api`);
 }
+
 bootstrap();

@@ -17,7 +17,11 @@ import { PrismaService } from '../prisma/prisma.service';
       name: 'transactions',
     }),
   ],
-  providers: [BackgroundWorkerProcessor, BackgroundWorkerService, PrismaService],
+  providers: [
+    BackgroundWorkerProcessor,
+    BackgroundWorkerService,
+    PrismaService,
+  ],
   exports: [BackgroundWorkerService],
 })
 export class BackgroundWorkerModule {}

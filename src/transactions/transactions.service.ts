@@ -33,18 +33,18 @@ export class TransactionsService {
     return this.prisma.transaction.findMany();
   }
 
-  findOne(id: number) {
-    return this.prisma.transaction.findUnique({ where: { id: id.toString() } });
+  findOne(id: string) {
+    return this.prisma.transaction.findUnique({ where: { id } });
   }
 
-  update(id: number, updateDto: UpdateTransactionDto) {
+  update(id: string, updateDto: UpdateTransactionDto) {
     return this.prisma.transaction.update({
-      where: { id: id.toString() },
+      where: { id },
       data: updateDto as any,
     });
   }
 
-  remove(id: number) {
-    return this.prisma.transaction.delete({ where: { id: id.toString() } });
+  remove(id: string) {
+    return this.prisma.transaction.delete({ where: { id } });
   }
 }

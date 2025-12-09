@@ -115,20 +115,20 @@ export class WalletController {
   @ApiResponse({ status: 200, description: 'Wallet details found.' })
   @ApiResponse({ status: 404, description: 'Wallet not found.' })
   findOne(@Param('id') id: string) {
-    return this.walletService.findOne(+id);
+    return this.walletService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update wallet', description: 'Update wallet details.' })
   @ApiResponse({ status: 200, description: 'Wallet updated.' })
   update(@Param('id') id: string, @Body() updateWalletDto: UpdateWalletDto) {
-    return this.walletService.update(+id, updateWalletDto);
+    return this.walletService.update(id, updateWalletDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove wallet', description: 'Delete a wallet permanently.' })
   @ApiResponse({ status: 200, description: 'Wallet deleted.' })
   remove(@Param('id') id: string) {
-    return this.walletService.remove(+id);
+    return this.walletService.remove(id);
   }
 }
