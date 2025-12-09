@@ -3,23 +3,18 @@ import { PaystackService } from './paystack.service';
 import { CreatePaystackDto } from './dto/create-paystack.dto';
 import { UpdatePaystackDto } from './dto/update-paystack.dto';
 
-@Controller('paystack')
+@Controller('wallet')
 export class PaystackController {
   constructor(private readonly paystackService: PaystackService) {}
 
-  @Post()
-  create(@Body() createPaystackDto: CreatePaystackDto) {
-    return this.paystackService.create(createPaystackDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.paystackService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paystackService.findOne(+id);
+  @Get('deposit/:reference/status')
+  async getDepositStatus(@Param('reference') reference: string) {
+    const data = await this.paystackService.verifyTransaction(reference);
+    return {
+      reference: data.reference,
+      status: data.status,
+      amount: data.amount,
+    };
   }
 
   @Patch(':id')

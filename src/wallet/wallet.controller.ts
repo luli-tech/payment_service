@@ -5,10 +5,12 @@ import { CreateWalletDto } from './dto/create-wallet.dto';
 import { UpdateWalletDto } from './dto/update-wallet.dto';
 import { TransferDto } from './dto/transfer-wallet.dto';
 import { CreatePaystackDto } from '../paystack/dto/create-paystack.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiKeyGuard } from '../auth/api-key.guard';
+import { UnifiedAuthGuard } from '../auth/unified-auth.guard';
+import { RequirePermissions } from '../auth/permissions.decorator';
+import { ApiKeyPermission } from '@prisma/client';
 
 @Controller('wallet')
+@UseGuards(UnifiedAuthGuard)
 export class WalletController {
   constructor(
     private readonly walletService: WalletService,
@@ -17,7 +19,7 @@ export class WalletController {
 
   // Deposit initialization via Paystack
   @Post('deposit')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
+  @RequirePermissions(ApiKeyPermission.DEPOSIT)
   async deposit(@Req() req, @Body() dto: CreatePaystackDto) {
     const userId = req.user?.sub || req.apiKey?.userId;
     // Ensure DTO contains userId for reference
@@ -26,14 +28,14 @@ export class WalletController {
   }
 
   @Get('balance')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
+  @RequirePermissions(ApiKeyPermission.READ)
   getBalance(@Req() req) {
     const userId = req.user?.sub || req.apiKey?.userId;
     return this.walletService.getBalance(userId);
   }
 
   @Get('transactions')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
+  @RequirePermissions(ApiKeyPermission.READ)
   getTransactions(@Req() req) {
     const userId = req.user?.sub || req.apiKey?.userId;
     return this.walletService.getTransactions(userId);
@@ -41,7 +43,7 @@ export class WalletController {
 
   // Transfer funds to another wallet
   @Post('transfer')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
+  @RequirePermissions(ApiKeyPermission.TRANSFER)
   transfer(@Req() req, @Body() transferDto: TransferDto) {
     const senderUserId = req.user?.sub || req.apiKey?.userId;
     const { recipientWalletId, amount } = transferDto;
@@ -49,31 +51,31 @@ export class WalletController {
   }
 
   @Post()
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
-  create(@Body() createWalletDto: CreateWalletDto) {
-    return this.walletService.create(createWalletDto);
+  create(@Req() req, @Body() createWalletDto: CreateWalletDto) {
+      const userId = req.user?.sub || req.apiKey?.userId;
+      // DTO might not have userId if it's coming from body, but service expects it.
+      // We pass it explicitly or merge it.
+      return this.walletService.create({ ...createWalletDto, userId });
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
+  @RequirePermissions(ApiKeyPermission.READ)
   findAll() {
     return this.walletService.findAll();
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
+  @RequirePermissions(ApiKeyPermission.READ)
   findOne(@Param('id') id: string) {
     return this.walletService.findOne(+id);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
   update(@Param('id') id: string, @Body() updateWalletDto: UpdateWalletDto) {
     return this.walletService.update(+id, updateWalletDto);
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard, ApiKeyGuard)
   remove(@Param('id') id: string) {
     return this.walletService.remove(+id);
   }

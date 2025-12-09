@@ -41,6 +41,17 @@ export class PaystackService {
     };
   }
 
+  async verifyTransaction(reference: string) {
+    try {
+      const response = await axios.get(`${this.baseUrl}/transaction/verify/${reference}`, {
+        headers: { Authorization: `Bearer ${this.secretKey}` },
+      });
+      return response.data.data;
+    } catch (error) {
+      throw new BadRequestException('Transaction verification failed');
+    }
+  }
+
   // Placeholder for other CRUD methods (not used)
   create(createPaystackDto: CreatePaystackDto) {
     return 'This action adds a new paystack';
