@@ -1,15 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { ApiKeysService } from './api-keys.service';
 import { CreateApiKeyDto } from './dto/create-api-key.dto';
 import { UpdateApiKeyDto } from './dto/update-api-key.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@Controller('api-keys')
+@Controller('keys')
+@UseGuards(JwtAuthGuard)
 export class ApiKeysController {
   constructor(private readonly apiKeysService: ApiKeysService) {}
 
-  @Post()
-  create(@Body() createApiKeyDto: CreateApiKeyDto) {
-    return this.apiKeysService.create(createApiKeyDto);
+  @Post('create')
+  create(@Req() req, @Body() createApiKeyDto: CreateApiKeyDto) {
+    const userId = req.user.sub;
+    return this.apiKeysService.create({ ...createApiKeyDto, userId });
+  }
+
+  @Post('rollover')
+  rollover(@Body() body: { expired_key_id: string; expiry: string }) {
+    return this.apiKeysService.rollover(body.expired_key_id, body.expiry);
   }
 
   @Get()

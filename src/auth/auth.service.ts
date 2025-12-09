@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
+    private usersService: UsersService,
     private jwtService: JwtService,
   ) {}
 
@@ -14,18 +14,19 @@ export class AuthService {
       return 'No user from google';
     }
 
-    let user = await this.prisma.user.findUnique({
-      where: { email: req.user.email },
-    });
+    let user = await this.usersService.findByEmail(req.user.email);
 
     if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          email: req.user.email,
-          firstName: req.user.firstName,
-          lastName: req.user.lastName,
-          picture: req.user.picture,
-          accessToken: req.user.accessToken,
+      user = await this.usersService.create({
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        picture: req.user.picture,
+        accessToken: req.user.accessToken,
+        wallet: {
+          create: {
+            balance: 0,
+          },
         },
       });
     }
