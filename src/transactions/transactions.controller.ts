@@ -26,7 +26,7 @@ export class TransactionsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get transaction by ID' })
+  @ApiOperation({ summary: 'Get transaction by id' })
   findOne(@Param('id') id: string) {
     return this.transactionsService.findOne(id);
   }
