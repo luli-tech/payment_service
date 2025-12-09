@@ -8,7 +8,7 @@ import { CreatePaystackDto } from '../paystack/dto/create-paystack.dto';
 import { UnifiedAuthGuard } from '../auth/unified-auth.guard';
 import { RequirePermissions } from '../auth/permissions.decorator';
 import { ApiKeyPermission } from '../common/enums/api-key-permission.enum';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
 
 @ApiTags('Wallet')
 @ApiBearerAuth()

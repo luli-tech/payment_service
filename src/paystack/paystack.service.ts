@@ -47,13 +47,13 @@ export class PaystackService {
         headers: { Authorization: `Bearer ${this.secretKey}` },
       });
       return response.data.data;
-    } catch (error) {
+    } catch {
       throw new BadRequestException('Transaction verification failed');
     }
   }
 
   // Placeholder for other CRUD methods (not used)
-  create(createPaystackDto: CreatePaystackDto) {
+  create(_createPaystackDto: CreatePaystackDto) {
     return 'This action adds a new paystack';
   }
   findAll() {
@@ -62,7 +62,7 @@ export class PaystackService {
   findOne(id: number) {
     return `This action returns a #${id} paystack`;
   }
-  update(id: number, updatePaystackDto: UpdatePaystackDto) {
+  update(id: number, _updatePaystackDto: UpdatePaystackDto) {
     return `This action updates a #${id} paystack`;
   }
   remove(id: number) {

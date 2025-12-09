@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PaystackService } from './paystack.service';
-import { CreatePaystackDto } from './dto/create-paystack.dto';
 import { UpdatePaystackDto } from './dto/update-paystack.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
