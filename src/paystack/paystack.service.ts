@@ -16,6 +16,10 @@ export class PaystackService {
     }
   }
 
+  getSecretKey() {
+    return this.secretKey;
+  }
+
   // Initialize a Paystack transaction and return the authorization URL
   async initialize(createPaystackDto: CreatePaystackDto) {
     const { amount, email, userId } = createPaystackDto as any; // expecting these fields

@@ -79,6 +79,11 @@ export class WalletService {
     return { status: 'success', message: 'Transfer completed' };
   }
 
+  // Expose transaction history for a user
+  async getTransactions(userId: string) {
+    return this.transactionsService.findByUser(userId);
+  }
+
   async update(id: number, updateWalletDto: UpdateWalletDto) {
     return this.prisma.wallet.update({
       where: { id: id.toString() },
