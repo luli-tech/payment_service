@@ -12,7 +12,7 @@ export class ApiKeysController {
   @Post('create')
   create(@Req() req, @Body() createApiKeyDto: CreateApiKeyDto) {
     const userId = req.user.sub;
-    return this.apiKeysService.create({ ...createApiKeyDto, userId });
+    return this.apiKeysService.create({ ...createApiKeyDto, userId } as any);
   }
 
   @Post('rollover')
@@ -27,16 +27,16 @@ export class ApiKeysController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.apiKeysService.findOne(+id);
+    return this.apiKeysService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateApiKeyDto: UpdateApiKeyDto) {
-    return this.apiKeysService.update(+id, updateApiKeyDto);
+    return this.apiKeysService.update(id, updateApiKeyDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.apiKeysService.remove(+id);
+    return this.apiKeysService.remove(id);
   }
 }

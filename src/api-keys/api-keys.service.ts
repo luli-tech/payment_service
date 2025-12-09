@@ -48,18 +48,18 @@ export class ApiKeysService {
     return this.prisma.apiKey.findMany();
   }
 
-  async findOne(id: number) {
-    const key = await this.prisma.apiKey.findUnique({ where: { id: id.toString() } });
+  async findOne(id: string) {
+    const key = await this.prisma.apiKey.findUnique({ where: { id } });
     if (!key) throw new NotFoundException('API key not found');
     return key;
   }
 
-  async update(id: number, updateApiKeyDto: UpdateApiKeyDto) {
-    return this.prisma.apiKey.update({ where: { id: id.toString() }, data: updateApiKeyDto as any });
+  async update(id: string, updateApiKeyDto: UpdateApiKeyDto) {
+    return this.prisma.apiKey.update({ where: { id }, data: updateApiKeyDto as any });
   }
 
-  async remove(id: number) {
-    return this.prisma.apiKey.delete({ where: { id: id.toString() } });
+  async remove(id: string) {
+    return this.prisma.apiKey.delete({ where: { id } });
   }
 
   // Rollover an expired key
