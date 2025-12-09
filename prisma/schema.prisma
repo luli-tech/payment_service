@@ -12,3 +12,70 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  firstName   String?
+  lastName    String?
+  picture     String?
+  accessToken String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  wallet      Wallet?
+  apiKeys     ApiKey[]
+  transactions Transaction[]
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  balance   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ApiKeyPermission {
+  DEPOSIT
+  TRANSFER
+  READ
+}
+
+model ApiKey {
+  id          String           @id @default(uuid())
+  key         String           @unique @default(uuid())
+  name        String
+  userId      String
+  user        User             @relation(fields: [userId], references: [id])
+  permissions ApiKeyPermission[]
+  expiresAt   DateTime
+  revoked     Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+enum TransactionType {
+  DEPOSIT
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+model Transaction {
+  id          String            @id @default(uuid())
+  userId      String
+  user        User              @relation(fields: [userId], references: [id])
+  type        TransactionType
+  amount      Int
+  status      TransactionStatus @default(PENDING)
+  reference   String?           @unique
+  senderId    String?
+  recipientId String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
