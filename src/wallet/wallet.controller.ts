@@ -7,7 +7,7 @@ import { TransferDto } from './dto/transfer-wallet.dto';
 import { CreatePaystackDto } from '../paystack/dto/create-paystack.dto';
 import { UnifiedAuthGuard } from '../auth/unified-auth.guard';
 import { RequirePermissions } from '../auth/permissions.decorator';
-import { ApiKeyPermission } from '@prisma/client';
+import { ApiKeyPermission } from '../common/enums/api-key-permission.enum';
 
 @Controller('wallet')
 @UseGuards(UnifiedAuthGuard)

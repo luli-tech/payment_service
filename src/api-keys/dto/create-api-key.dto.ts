@@ -1,4 +1,4 @@
-import { ApiKeyPermission } from '@prisma/client';
+import { ApiKeyPermission } from '../../common/enums/api-key-permission.enum';
 
 export class CreateApiKeyDto {
   name: string;

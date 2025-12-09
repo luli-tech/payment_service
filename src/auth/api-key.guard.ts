@@ -3,7 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { PrismaService } from '../prisma/prisma.service';
 import { Request } from 'express';
 import { PERMISSIONS_KEY } from './permissions.decorator';
-import { ApiKeyPermission } from '@prisma/client';
+import { ApiKeyPermission } from '../common/enums/api-key-permission.enum';
 
 @Injectable()
 export class ApiKeyGuard implements CanActivate {
@@ -29,12 +29,9 @@ export class ApiKeyGuard implements CanActivate {
     // Let's implement the checking logic first.
     
     if (!apiKey) {
-      // If we want "OR" logic with JWT, we should probably handle it in a Unified Guard.
-      // For now, if this guard is hit, and no API key, it returns true ONLY if we assume JWT might be there?
-      // No, let's strictly enforce API Key here, and fix the Controller to use a Composite Guard later.
-      return true; // TEMPORARY: Return true if no key to allow JWT guard to fail or pass? 
-      // Actually, standard practice for "OR" is a Custom Guard.
-      // Let's stick to valid check if key exists.
+      // UnifiedAuthGuard ensures this guard handles logic when header is present.
+      // But if used alone, it should enforce key presence.
+      throw new UnauthorizedException('API key missing');
     }
 
     const keyRecord = await this.prisma.apiKey.findUnique({ where: { key: apiKey } });
