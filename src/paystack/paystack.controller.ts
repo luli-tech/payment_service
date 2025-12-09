@@ -2,12 +2,21 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PaystackService } from './paystack.service';
 import { CreatePaystackDto } from './dto/create-paystack.dto';
 import { UpdatePaystackDto } from './dto/update-paystack.dto';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Deposit Status')
 @Controller('wallet')
 export class PaystackController {
   constructor(private readonly paystackService: PaystackService) {}
 
   @Get('deposit/:reference/status')
+  @ApiOperation({ 
+    summary: 'Verify deposit status (manual check)', 
+    description: 'Manually check the status of a Paystack transaction by reference. NOTE: This does NOT credit the wallet. Only webhooks do.' 
+  })
+  @ApiResponse({ status: 200, description: 'Transaction status returned.' })
+  @ApiResponse({ status: 400, description: 'Bad Request. Verification failed.' })
+  @ApiResponse({ status: 404, description: 'Transaction not found.' })
   async getDepositStatus(@Param('reference') reference: string) {
     const data = await this.paystackService.verifyTransaction(reference);
     return {
