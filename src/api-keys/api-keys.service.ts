@@ -1,18 +1,28 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateApiKeyDto } from './dto/create-api-key.dto';
 import { UpdateApiKeyDto } from './dto/update-api-key.dto';
 import { v4 as uuidv4 } from 'uuid';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class ApiKeysService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // Helper to convert expiry string to Date
+  // Convert "1D", "1H", "1M", "1Y" → REAL Date
   private parseExpiry(expiry: string): Date {
+    if (!['H', 'D', 'M', 'Y'].includes(expiry.slice(-1).toUpperCase())) {
+      throw new BadRequestException('Expiry must be one of: 1H, 1D, 1M, 1Y');
+    }
+
     const now = new Date();
     const amount = parseInt(expiry.slice(0, -1), 10);
     const unit = expiry.slice(-1).toUpperCase();
+
     switch (unit) {
       case 'H':
         return new Date(now.getTime() + amount * 60 * 60 * 1000);
@@ -22,65 +32,147 @@ export class ApiKeysService {
         return new Date(now.setMonth(now.getMonth() + amount));
       case 'Y':
         return new Date(now.setFullYear(now.getFullYear() + amount));
+
       default:
         throw new BadRequestException('Invalid expiry format');
     }
   }
 
-  async create(createApiKeyDto: CreateApiKeyDto) {
-    const { name, permissions, expiry, userId } = createApiKeyDto as unknown as CreateApiKeyDto & { userId: string };
-    // Enforce max 5 active keys per user
-    const activeCount = await this.prisma.apiKey.count({
-      where: { userId, revoked: false, expiresAt: { gt: new Date() } },
+  // Secure Hash
+  private hashKey(key: string): string {
+    return crypto.createHash('sha256').update(key).digest('hex');
+  }
+
+  // Generate a Stripe-like key
+  private generateKey(): { plain: string; hashed: string } {
+    const plain = `sk_live_${uuidv4().replace(/-/g, '')}`;
+    return { plain, hashed: this.hashKey(plain) };
+  }
+
+  async create(dto: CreateApiKeyDto & { userId: string }) {
+    const { name, permissions, expiry, userId } = dto;
+
+    // ENFORCE permitted permissions
+    const validPerms = ['READ', 'DEPOSIT', 'TRANSFER'];
+    permissions.forEach((p) => {
+      if (!validPerms.includes(p.toUpperCase())) {
+        throw new BadRequestException(`Invalid permission: ${p}`);
+      }
     });
-    if (activeCount >= 5) {
-      throw new BadRequestException('Maximum of 5 active API keys per user reached');
-    }
+
+    // Maximum 5 active keys per user
+    const active = await this.prisma.apiKey.count({
+      where: {
+        userId,
+        revoked: false,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (active >= 5)
+      throw new BadRequestException('Max 5 active API keys reached');
+
     const expiresAt = this.parseExpiry(expiry);
-    const apiKey = uuidv4();
+
+    const { plain, hashed } = this.generateKey();
+
     const record = await this.prisma.apiKey.create({
-      data: { name, permissions, expiresAt, key: apiKey, userId },
+      data: {
+        name,
+        permissions,
+        expiresAt,
+        key: hashed, // Store hashed key only
+        userId,
+        revoked: false,
+      },
     });
-    return { api_key: record.key, expires_at: record.expiresAt };
+
+    return {
+      api_key: plain, // Return plain ONLY ONCE
+      expires_at: expiresAt,
+    };
   }
 
   async findAll() {
-    return this.prisma.apiKey.findMany();
+    return this.prisma.apiKey.findMany({
+      select: {
+        id: true,
+        name: true,
+        permissions: true,
+        expiresAt: true,
+        revoked: true,
+        userId: true,
+        createdAt: true,
+      },
+    });
   }
 
   async findOne(id: string) {
-    const key = await this.prisma.apiKey.findUnique({ where: { id } });
+    const key = await this.prisma.apiKey.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        permissions: true,
+        expiresAt: true,
+        revoked: true,
+        userId: true,
+      },
+    });
+
     if (!key) throw new NotFoundException('API key not found');
     return key;
   }
 
-  async update(id: string, updateApiKeyDto: UpdateApiKeyDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    return this.prisma.apiKey.update({ where: { id }, data: updateApiKeyDto as any });
+  async update(id: string, dto: UpdateApiKeyDto) {
+    return this.prisma.apiKey.update({
+      where: { id },
+      data: dto,
+    });
   }
 
   async remove(id: string) {
-    return this.prisma.apiKey.delete({ where: { id } });
+    return this.prisma.apiKey.update({
+      where: { id },
+      data: { revoked: true },
+    });
   }
 
-  // Rollover an expired key
-  async rollover(expiredKeyId: string, newExpiry: string) {
-    const oldKey = await this.prisma.apiKey.findUnique({ where: { id: expiredKeyId } });
-    if (!oldKey) throw new NotFoundException('Expired API key not found');
-    if (new Date(oldKey.expiresAt) > new Date()) {
-      throw new BadRequestException('Provided key is not expired');
+  // Rollover logic
+  async rollover(expiredKeyId: string, expiry: string) {
+    const oldKey = await this.prisma.apiKey.findUnique({
+      where: { id: expiredKeyId },
+    });
+
+    if (!oldKey) throw new NotFoundException('Key not found');
+
+    if (oldKey.expiresAt > new Date()) {
+      throw new BadRequestException('Key is not yet expired');
     }
-    const newKey = uuidv4();
-    const expiresAt = this.parseExpiry(newExpiry);
-    const record = await this.prisma.apiKey.create({
+
+    // Mark old key as revoked
+    await this.prisma.apiKey.update({
+      where: { id: expiredKeyId },
+      data: { revoked: true },
+    });
+
+    // Create new key with same permissions
+    const expiresAt = this.parseExpiry(expiry);
+    const { plain, hashed } = this.generateKey();
+
+    const newKey = await this.prisma.apiKey.create({
       data: {
         name: oldKey.name,
         permissions: oldKey.permissions,
         expiresAt,
-        key: newKey,
+        key: hashed,
         userId: oldKey.userId,
       },
     });
-    return { api_key: record.key, expires_at: record.expiresAt };
+
+    return {
+      api_key: plain,
+      expires_at: expiresAt,
+    };
   }
 }
