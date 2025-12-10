@@ -7,7 +7,11 @@ async function bootstrap() {
 
   // Enable CORS for frontend requests
   app.enableCors({
-    origin: ['http://localhost:3000'], // your frontend URLs
+    origin: [
+      'http://localhost:3000',
+      'https://paymentservice-production-364a.up.railway.app/api',
+      'https://paymentservice-production-364a.up.railway.app',
+    ], // your frontend URLs
     credentials: true,
   });
 
