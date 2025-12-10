@@ -41,9 +41,7 @@ export class AuthController {
         .status(401)
         .json({ message: 'Unauthorized. Google login failed.' });
     }
-    const loginResult = await this.authService.googleLogin(req);
-
-    // Instead of redirecting, return JSON
-    return res.status(200).json(loginResult);
+    const jwtResult = await this.authService.googleLogin(req);
+    return res.status(200).json(jwtResult);
   }
 }

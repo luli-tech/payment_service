@@ -31,11 +31,15 @@ export class AuthService {
       });
     }
 
-    const payload = { email: user.email, sub: user.id };
-    return {
-      message: 'User information from google',
-      user: user,
-      access_token: this.jwtService.sign(payload),
+    // Embed user info inside the JWT
+    const payload = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
     };
+    const token = this.jwtService.sign(payload);
+
+    return { token };
   }
 }
