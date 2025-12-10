@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_SECRET') || 'supersecret', // TODO: Use environment variable
+      secretOrKey: configService.get('JWT_SECRET') || 'supersecret',
     });
   }
 
@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       where: { id: payload.sub },
     });
     if (!user) {
-      throw new Error('Unauthorized'); // Or throw a more specific NestJS exception
+      throw new Error('Unauthorized');
     }
     return user;
   }

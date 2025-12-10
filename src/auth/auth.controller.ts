@@ -1,8 +1,8 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-
+import { Response } from 'express';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -10,7 +10,10 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Initiate Google Login', description: 'Redirects to Google OAuth page for user authentication.' })
+  @ApiOperation({
+    summary: 'Initiate Google Login',
+    description: 'Redirects to Google OAuth page for user authentication.',
+  })
   @ApiResponse({ status: 302, description: 'Redirects to Google.' })
   async googleAuth(@Req() req) {
     // Initiates the Google OAuth2 login flow
@@ -18,10 +21,29 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
-  @ApiOperation({ summary: 'Google Cloud Callback', description: 'Handles the callback from Google, creates/logs in user, and returns JWT.' })
-  @ApiResponse({ status: 200, description: 'User authenticated successfully. Returns JWT access token and user info.' })
-  @ApiResponse({ status: 401, description: 'Unauthorized. Google login failed.' })
-  async googleAuthRedirect(@Req() req) {
-    return this.authService.googleLogin(req);
+  @ApiOperation({
+    summary: 'Google Cloud Callback',
+    description:
+      'Handles the callback from Google, creates/logs in user, and returns JWT.',
+  })
+  @ApiResponse({
+    status: 200,
+    description:
+      'User authenticated successfully. Returns JWT access token and user info.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized. Google login failed.',
+  })
+  async googleAuthRedirect(@Req() req, @Res() res: Response) {
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ message: 'Unauthorized. Google login failed.' });
+    }
+    const loginResult = await this.authService.googleLogin(req);
+
+    // Instead of redirecting, return JSON
+    return res.status(200).json(loginResult);
   }
 }
