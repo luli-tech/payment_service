@@ -60,6 +60,15 @@ export class ApiKeysService {
       }
     });
 
+    if (userId) {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (!user) {
+        throw new BadRequestException('User with provided ID does not exist');
+      }
+    }
+
     // Maximum 5 active keys per user
     const active = await this.prisma.apiKey.count({
       where: {
@@ -88,9 +97,21 @@ export class ApiKeysService {
     });
 
     return {
-      api_key: plain, // Return plain ONLY ONCE
-      expires_at: expiresAt,
+      id: record.id,
+      name: record.name,
+      userId: record.userId,
+      permissions: record.permissions,
+      revoked: record.revoked,
+      createdAt: record.createdAt,
+      updatedAt: record.updatedAt,
+      expiresAt: record.expiresAt,
+      api_key: plain, // include the plain key
     };
+
+    // return {
+    //   api_key: plain, // Return plain ONLY ONCE
+    //   expires_at: expiresAt,
+    // };
   }
 
   async findAll() {
@@ -103,6 +124,7 @@ export class ApiKeysService {
         revoked: true,
         userId: true,
         createdAt: true,
+        key: true,
       },
     });
   }
@@ -117,6 +139,7 @@ export class ApiKeysService {
         expiresAt: true,
         revoked: true,
         userId: true,
+        key: true,
       },
     });
 

@@ -33,7 +33,7 @@ export class AuthService {
 
     // Embed user info inside the JWT
     const payload = {
-      sub: user.id, // <---- THIS IS WHAT JwtStrategy READS
+      sub: user.id,
       email: user.email,
     };
     const token = this.jwtService.sign(payload);

@@ -1,4 +1,18 @@
-import { Controller, Get, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Headers,
+  HttpCode,
+  BadRequestException,
+  UnauthorizedException, 
+  Req,
+} from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PaystackService } from './paystack.service';
 import { UpdatePaystackDto } from './dto/update-paystack.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -29,16 +43,37 @@ export class PaystackController {
     };
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePaystackDto: UpdatePaystackDto,
-  ) {
-    return this.paystackService.update(+id, updatePaystackDto);
-  }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paystackService.remove(+id);
+  @Post('paystack/webhook')
+  @HttpCode(200)
+  @ApiOperation({
+    summary: 'Paystack Webhook Endpoint',
+    description: 'Receives payment events from Paystack. Credits user wallet on success.',
+  })
+  async webhook(@Headers('x-paystack-signature') signature: string, @Req() req) {
+    if (!signature) {
+      throw new BadRequestException('Missing signature');
+    }
+
+    const secret = this.paystackService.getSecretKey();
+    const hash = crypto
+      .createHmac('sha512', secret)
+      .update(JSON.stringify(req.body))
+      .digest('hex');
+
+    if (hash !== signature) {
+      throw new UnauthorizedException('Invalid signature');
+    }
+
+    const event = req.body;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (event.event === 'charge.success') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const data = event.data;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      await this.paystackService.processSuccessfulPayment(data.reference, data.amount);
+    }
+
+    return { status: true };
   }
 }
