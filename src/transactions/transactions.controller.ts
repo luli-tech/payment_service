@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('Transactions (Internal)')
@@ -13,13 +27,19 @@ export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a transaction (Internal)', description: 'Directly create a transaction record.' })
+  @ApiOperation({
+    summary: 'Create a transaction (Internal)',
+    description: 'Directly create a transaction record.',
+  })
   create(@Body() createTransactionDto: CreateTransactionDto) {
     return this.transactionsService.create(createTransactionDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all transactions (Admin)', description: 'Retrieve all transactions in the system.' })
+  @ApiOperation({
+    summary: 'List all transactions (Admin)',
+    description: 'Retrieve all transactions in the system.',
+  })
   @ApiResponse({ status: 200, description: 'List of transactions returned.' })
   findAll() {
     return this.transactionsService.findAll();
@@ -33,7 +53,10 @@ export class TransactionsController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update transaction' })
-  update(@Param('id') id: string, @Body() updateTransactionDto: UpdateTransactionDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateTransactionDto: UpdateTransactionDto,
+  ) {
     return this.transactionsService.update(id, updateTransactionDto);
   }
 

@@ -23,7 +23,9 @@ export class TransactionsService {
   // Return all transactions for a given user, most recent first
   async findByUser(userId: string) {
     if (!userId) {
-      throw new BadRequestException('User ID is required to fetch transactions');
+      throw new BadRequestException(
+        'User ID is required to fetch transactions',
+      );
     }
 
     const wallet = await this.prisma.wallet.findUnique({
@@ -33,10 +35,7 @@ export class TransactionsService {
 
     const transactions = await this.prisma.transaction.findMany({
       where: {
-        OR: [
-          { userId },
-          ...(wallet ? [{ recipientId: wallet.id }] : []),
-        ],
+        OR: [{ userId }, ...(wallet ? [{ recipientId: wallet.id }] : [])],
       },
       orderBy: { createdAt: 'desc' },
     });

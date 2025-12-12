@@ -75,7 +75,7 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     // attach to request for downstream use
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
     (request as any).apiKey = keyRecord;
     return true;
   }

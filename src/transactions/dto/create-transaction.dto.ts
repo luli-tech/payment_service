@@ -16,4 +16,3 @@ export class CreateTransactionDto {
   @ApiProperty({ required: false })
   recipientId?: string;
 }
-

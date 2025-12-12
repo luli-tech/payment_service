@@ -28,9 +28,11 @@ export class PaystackService {
   // Initialize transaction
   async initialize(createPaystackDto: CreatePaystackDto) {
     const { amount, userId, email } = createPaystackDto;
-    
+
     if (!userId) {
-      throw new BadRequestException('User ID is required for Paystack initialization');
+      throw new BadRequestException(
+        'User ID is required for Paystack initialization',
+      );
     }
 
     if (!email) {
@@ -70,12 +72,12 @@ export class PaystackService {
       await this.prisma.transaction.create({
         data: {
           userId,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+
           amount: paystackAmount,
           reference,
           type: 'DEPOSIT',
           status: 'PENDING',
-          senderId: wallet.id,    // Set sender as self (wallet) for deposit
+          senderId: wallet.id, // Set sender as self (wallet) for deposit
           recipientId: wallet.id, // Set recipient as self (wallet)
         },
       });

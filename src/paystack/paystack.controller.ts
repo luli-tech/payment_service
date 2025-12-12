@@ -6,7 +6,7 @@ import {
   Headers,
   HttpCode,
   BadRequestException,
-  UnauthorizedException, 
+  UnauthorizedException,
   Req,
 } from '@nestjs/common';
 import * as crypto from 'crypto';
@@ -39,14 +39,17 @@ export class PaystackController {
     };
   }
 
-
   @Post('paystack/webhook')
   @HttpCode(200)
   @ApiOperation({
     summary: 'Paystack Webhook Endpoint',
-    description: 'Receives payment events from Paystack. Credits user wallet on success.',
+    description:
+      'Receives payment events from Paystack. Credits user wallet on success.',
   })
-  async webhook(@Headers('x-paystack-signature') signature: string, @Req() req) {
+  async webhook(
+    @Headers('x-paystack-signature') signature: string,
+    @Req() req,
+  ) {
     if (!signature) {
       throw new BadRequestException('Missing signature');
     }
@@ -62,11 +65,13 @@ export class PaystackController {
     }
 
     const event = req.body;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
     if (event.event === 'charge.success') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const data = event.data as { reference: string; amount: number };
-      await this.paystackService.processSuccessfulPayment(data.reference, data.amount);
+      await this.paystackService.processSuccessfulPayment(
+        data.reference,
+        data.amount,
+      );
     }
 
     return { status: true };

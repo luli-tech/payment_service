@@ -11,6 +11,12 @@ import { UnifiedAuthGuard } from '../auth/unified-auth.guard';
 @Module({
   imports: [TransactionsModule, PaystackModule],
   controllers: [WalletController],
-  providers: [WalletService, PrismaService, JwtAuthGuard, ApiKeyGuard, UnifiedAuthGuard],
+  providers: [
+    WalletService,
+    PrismaService,
+    JwtAuthGuard,
+    ApiKeyGuard,
+    UnifiedAuthGuard,
+  ],
 })
 export class WalletModule {}

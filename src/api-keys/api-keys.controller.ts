@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UseGuards,
-  Req,
-} from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { ApiKeysService } from './api-keys.service';
 import { CreateApiKeyDto } from './dto/create-api-key.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -26,7 +20,6 @@ interface AuthenticatedRequest extends Request {
     picture?: string;
   };
 }
-
 
 @ApiTags('API Keys')
 @ApiBearerAuth()
@@ -54,12 +47,17 @@ export class ApiKeysController {
     status: 401,
     description: 'Unauthorized. User not authenticated.',
   })
-  async create(@Req() req: AuthenticatedRequest, @Body() createApiKeyDto: CreateApiKeyDto) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const userId = req.user.id;
+  async create(
+    @Req() req: AuthenticatedRequest,
+    @Body() createApiKeyDto: CreateApiKeyDto,
+  ) {
+    const userId = req.user.id;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    const result = await this.apiKeysService.create({ ...createApiKeyDto, userId } as any);
+    const result = await this.apiKeysService.create({
+      ...createApiKeyDto,
+      userId,
+    } as any);
     return {
       api_key: result.api_key,
       expires_at: result.expiresAt,
@@ -93,6 +91,4 @@ export class ApiKeysController {
   rollover(@Body() body: { expired_key_id: string; expiry: string }) {
     return this.apiKeysService.rollover(body.expired_key_id, body.expiry);
   }
-
-
 }

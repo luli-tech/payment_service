@@ -64,8 +64,12 @@ export class WalletController {
   })
   async deposit(@Req() req, @Body() dto: CreatePaystackDto) {
     const userId = req.user.id as string;
-    
-    const payload = { ...dto, userId, email: (req.user as any)?.email as string };
+
+    const payload = {
+      ...dto,
+      userId,
+      email: req.user?.email as string,
+    };
     return await this.paystackService.initialize(payload);
   }
 
@@ -119,7 +123,10 @@ export class WalletController {
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async getTransactions(@Req() req) {
     const userId = (req.user?.id || req.apiKey?.userId) as string;
-    if (!userId) throw new BadRequestException('User ID could not be determined from auth context');
+    if (!userId)
+      throw new BadRequestException(
+        'User ID could not be determined from auth context',
+      );
     return await this.walletService.getTransactions(userId);
   }
 
@@ -151,8 +158,10 @@ export class WalletController {
   async transfer(@Req() req, @Body() transferDto: TransferDto) {
     const senderUserId = (req.user?.id || req.apiKey?.userId) as string;
     const { wallet_number, amount } = transferDto;
-    return await this.walletService.transfer(senderUserId, wallet_number, amount);
+    return await this.walletService.transfer(
+      senderUserId,
+      wallet_number,
+      amount,
+    );
   }
-
-
 }

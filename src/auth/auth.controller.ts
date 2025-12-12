@@ -36,23 +36,22 @@ export class AuthController {
     description: 'Unauthorized. Google login failed.',
   })
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (!req.user) {
       return res
         .status(401)
         .json({ message: 'Unauthorized. Google login failed.' });
     }
     interface GoogleUserRequest extends Request {
-    user: {
-      id: string;
-      email: string;
-      firstName: string;
-      lastName: string;
-      picture: string;
-      accessToken: string;
-    };
-  }
-  const typedReq = req as GoogleUserRequest;
+      user: {
+        id: string;
+        email: string;
+        firstName: string;
+        lastName: string;
+        picture: string;
+        accessToken: string;
+      };
+    }
+    const typedReq = req as GoogleUserRequest;
 
     const jwtResult = await this.authService.googleLogin(typedReq);
     return res.status(200).json(jwtResult);
