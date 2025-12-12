@@ -6,7 +6,7 @@ export class CreateApiKeyDto {
     description: 'Name of the API Key',
     example: 'My Service Key',
   })
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description: 'List of permissions',
@@ -14,8 +14,8 @@ export class CreateApiKeyDto {
     isArray: true,
     example: [ApiKeyPermission.READ, ApiKeyPermission.DEPOSIT],
   })
-  permissions: ApiKeyPermission[];
+  permissions!: ApiKeyPermission[];
 
   @ApiProperty({ description: 'Expiry duration', example: '1D' })
-  expiry: string; // "1H", "1D", "1M", "1Y"
+  expiry!: string; // "1H", "1D", "1M", "1Y"
 }

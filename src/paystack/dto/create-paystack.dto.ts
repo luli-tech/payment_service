@@ -2,11 +2,11 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreatePaystackDto {
   @ApiProperty({ description: 'User ID', example: '12345' })
-  userId: string;
+  userId!: string;
 
   @ApiProperty({ description: 'Customer email', example: 'user@example.com' })
-  email: string;
+  email!: string;
 
   @ApiProperty({ description: 'Amount in Naira', example: 5000 })
-  amount: number;
+  amount!: number;
 }
