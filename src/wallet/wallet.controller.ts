@@ -68,14 +68,10 @@ export class WalletController {
     description: 'Internal Server Error. Paystack initialization failed.',
   })
   async deposit(@Req() req, @Body() dto: CreatePaystackDto) {
-    try {
-      const userId = req.user.id as string;
-      
-      const payload = { ...dto };
-      return await this.paystackService.initialize(payload, userId, (req.user as any)?.email as string);
-    } catch (error) {
-       throw error;
-    }
+    const userId = req.user.id as string;
+    
+    const payload = { ...dto };
+    return await this.paystackService.initialize(payload, userId, (req.user as any)?.email as string);
   }
 
   @Get('balance')
@@ -101,12 +97,8 @@ export class WalletController {
   @ApiResponse({ status: 404, description: 'Wallet not found for user.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async getBalance(@Req() req) {
-    try {
-      const userId = req.user.id as string;
-      return await this.walletService.getBalance(userId);
-    } catch (error) {
-      throw error;
-    }
+    const userId = req.user.id as string;
+    return await this.walletService.getBalance(userId);
   }
 
   @Get('transactions')
@@ -131,13 +123,9 @@ export class WalletController {
   })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async getTransactions(@Req() req) {
-    try {
-      const userId = (req.user?.id || req.apiKey?.userId) as string;
-      if (!userId) throw new BadRequestException('User ID could not be determined from auth context');
-      return await this.walletService.getTransactions(userId);
-    } catch (error) {
-      throw error;
-    }
+    const userId = (req.user?.id || req.apiKey?.userId) as string;
+    if (!userId) throw new BadRequestException('User ID could not be determined from auth context');
+    return await this.walletService.getTransactions(userId);
   }
 
   @Post('transfer')
@@ -166,13 +154,9 @@ export class WalletController {
     description: 'Internal Server Error. Transaction failed.',
   })
   async transfer(@Req() req, @Body() transferDto: TransferDto) {
-    try {
-      const senderUserId = (req.user?.id || req.apiKey?.userId) as string;
-      const { wallet_number, amount } = transferDto;
-      return await this.walletService.transfer(senderUserId, wallet_number, amount);
-    } catch (error) {
-      throw error;
-    }
+    const senderUserId = (req.user?.id || req.apiKey?.userId) as string;
+    const { wallet_number, amount } = transferDto;
+    return await this.walletService.transfer(senderUserId, wallet_number, amount);
   }
 
 

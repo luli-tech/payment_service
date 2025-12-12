@@ -69,8 +69,7 @@ export class PaystackController {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (event.event === 'charge.success') {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const data = event.data;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
+      const data = event.data as { reference: string; amount: number };
       await this.paystackService.processSuccessfulPayment(data.reference, data.amount);
     }
 
