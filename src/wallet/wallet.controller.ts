@@ -3,17 +3,12 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   Req,
   UseGuards,
   BadRequestException,
 } from '@nestjs/common';
 import { WalletService } from './wallet.service';
 import { PaystackService } from '../paystack/paystack.service';
-import { CreateWalletDto } from './dto/create-wallet.dto';
-import { UpdateWalletDto } from './dto/update-wallet.dto';
 import { TransferDto } from './dto/transfer-wallet.dto';
 import { CreatePaystackDto } from '../paystack/dto/create-paystack.dto';
 import { UnifiedAuthGuard } from '../auth/unified-auth.guard';
