@@ -15,7 +15,7 @@ export class AuthController {
     description: 'Redirects to Google OAuth page for user authentication.',
   })
   @ApiResponse({ status: 302, description: 'Redirects to Google.' })
-  async googleAuth(@Req() req) {
+  async googleAuth() {
     // Initiates the Google OAuth2 login flow
   }
 
@@ -36,6 +36,7 @@ export class AuthController {
     description: 'Unauthorized. Google login failed.',
   })
   async googleAuthRedirect(@Req() req, @Res() res: Response) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (!req.user) {
       return res
         .status(401)

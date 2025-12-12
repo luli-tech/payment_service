@@ -183,7 +183,7 @@ export class ApiKeysService {
     const expiresAt = this.parseExpiry(expiry);
     const { plain, hashed } = this.generateKey();
 
-    const newKey = await this.prisma.apiKey.create({
+    await this.prisma.apiKey.create({
       data: {
         name: oldKey.name,
         permissions: oldKey.permissions,

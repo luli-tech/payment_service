@@ -70,8 +70,8 @@ export class WalletController {
   async deposit(@Req() req, @Body() dto: CreatePaystackDto) {
     const userId = req.user.id as string;
     
-    const payload = { ...dto };
-    return await this.paystackService.initialize(payload, userId, (req.user as any)?.email as string);
+    const payload = { ...dto, userId, email: (req.user as any)?.email as string };
+    return await this.paystackService.initialize(payload);
   }
 
   @Get('balance')

@@ -26,8 +26,8 @@ export class PaystackService {
   }
 
   // Initialize transaction
-  async initialize(createPaystackDto: CreatePaystackDto, userId: string, email: string) {
-    const { amount } = createPaystackDto;
+  async initialize(createPaystackDto: CreatePaystackDto) {
+    const { amount, userId, email } = createPaystackDto;
     
     if (!userId) {
       throw new BadRequestException('User ID is required for Paystack initialization');
