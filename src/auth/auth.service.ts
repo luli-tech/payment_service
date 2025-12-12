@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
+import { GoogleUser } from 'src/utils/types/express-req.interface';
 
 @Injectable()
 export class AuthService {
@@ -9,12 +10,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async googleLogin(req) {
+  async googleLogin(req: { user: GoogleUser }) {
     if (!req.user) {
       return 'No user from google';
     }
 
-    let user = await this.usersService.findByEmail(req.user.email as string);
+    let user = await this.usersService.findByEmail(req.user.email);
 
     if (!user) {
       user = await this.usersService.create({

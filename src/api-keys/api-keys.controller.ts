@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { ApiKeysService } from './api-keys.service';
 import { CreateApiKeyDto } from './dto/create-api-key.dto';
-import { UpdateApiKeyDto } from './dto/update-api-key.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import {
   ApiTags,
@@ -44,7 +43,7 @@ export class ApiKeysController {
     description: 'Unauthorized. User not authenticated.',
   })
   async create(@Req() req, @Body() createApiKeyDto: CreateApiKeyDto) {
-    const userId = req.user?.id as string;
+    const userId = (req as any).user?.id as string;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const result = await this.apiKeysService.create({ ...createApiKeyDto, userId } as any);
     return {
