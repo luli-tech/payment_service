@@ -11,7 +11,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url="postgresql://postgres:112233@localhost:5432/rexQlink?schema=public"
+  url=env("DATABASE_URL")
 }
 
 model User {
