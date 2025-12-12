@@ -43,6 +43,7 @@ export class ApiKeysController {
     description: 'Unauthorized. User not authenticated.',
   })
   async create(@Req() req, @Body() createApiKeyDto: CreateApiKeyDto) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const userId = (req as any).user?.id as string;
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const result = await this.apiKeysService.create({ ...createApiKeyDto, userId } as any);

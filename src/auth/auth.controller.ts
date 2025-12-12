@@ -42,7 +42,7 @@ export class AuthController {
         .status(401)
         .json({ message: 'Unauthorized. Google login failed.' });
     }
-    const jwtResult = await this.authService.googleLogin(req);
+    const jwtResult = await this.authService.googleLogin(req as any);
     return res.status(200).json(jwtResult);
   }
 }
