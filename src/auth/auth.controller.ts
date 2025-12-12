@@ -2,7 +2,7 @@ import { Controller, Get, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -42,7 +42,19 @@ export class AuthController {
         .status(401)
         .json({ message: 'Unauthorized. Google login failed.' });
     }
-    const jwtResult = await this.authService.googleLogin(req as any);
+    interface GoogleUserRequest extends Request {
+    user: {
+      id: string;
+      email: string;
+      firstName: string;
+      lastName: string;
+      picture: string;
+      accessToken: string;
+    };
+  }
+  const typedReq = req as GoogleUserRequest;
+
+    const jwtResult = await this.authService.googleLogin(typedReq);
     return res.status(200).json(jwtResult);
   }
 }

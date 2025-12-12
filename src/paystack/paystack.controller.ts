@@ -2,10 +2,7 @@ import {
   Controller,
   Get,
   Post,
-  Body,
-  Patch,
   Param,
-  Delete,
   Headers,
   HttpCode,
   BadRequestException,
@@ -14,7 +11,6 @@ import {
 } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { PaystackService } from './paystack.service';
-import { UpdatePaystackDto } from './dto/update-paystack.dto';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Deposit Status')

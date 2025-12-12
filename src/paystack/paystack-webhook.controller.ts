@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PaystackService } from './paystack.service';
 import * as crypto from 'crypto';
-
+import { PaystackWebhookEvent } from 'src/utils/types/pasytackWebHoodTypes';
 @Controller('wallet/paystack')
 export class PaystackWebhookController {
   constructor(private readonly paystack: PaystackService) {}
@@ -15,7 +15,7 @@ export class PaystackWebhookController {
   @Post('webhook')
   async handle(
     @Headers('x-paystack-signature') signature: string,
-    @Body() payload: any,
+    @Body() payload: PaystackWebhookEvent,
   ) {
     // Verify signature
     const hash = crypto

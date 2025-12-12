@@ -77,7 +77,7 @@ export class PaystackService {
           status: 'PENDING',
           senderId: wallet.id,    // Set sender as self (wallet) for deposit
           recipientId: wallet.id, // Set recipient as self (wallet)
-        } as any,
+        },
       });
     } catch (error) {
       console.warn('Failed to create pending transaction:', error);
@@ -142,22 +142,5 @@ export class PaystackService {
     ]);
 
     console.log(`Payment successful: reference=${reference}, amount=${amount}`);
-  }
-
-  // CRUD placeholders
-  create(_dto: CreatePaystackDto) {
-    return 'Not implemented';
-  }
-  findAll() {
-    return 'Not implemented';
-  }
-  findOne(id: number) {
-    return `Not implemented for id ${id}`;
-  }
-  update(id: number, _dto: UpdatePaystackDto) {
-    return `Not implemented for id ${id}`;
-  }
-  remove(id: number) {
-    return `Not implemented for id ${id}`;
   }
 }
