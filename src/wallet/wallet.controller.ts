@@ -63,7 +63,11 @@ export class WalletController {
     description: 'Internal Server Error. Paystack initialization failed.',
   })
   async deposit(@Req() req, @Body() dto: CreatePaystackDto) {
-    const userId = req.user.id as string;
+    const user = req.user;
+    if (!user) {
+       throw new BadRequestException('User context not found. Ensure you are authenticated as a user.');
+    }
+    const userId = user.id as string;
 
     const payload = {
       ...dto,
@@ -96,7 +100,10 @@ export class WalletController {
   @ApiResponse({ status: 404, description: 'Wallet not found for user.' })
   @ApiResponse({ status: 500, description: 'Internal Server Error.' })
   async getBalance(@Req() req) {
-    const userId = req.user.id as string;
+    const userId = (req.user?.id || req.apiKey?.userId) as string;
+    if (!userId) {
+       throw new BadRequestException('User context not found.');
+    }
     return await this.walletService.getBalance(userId);
   }
 
@@ -157,6 +164,9 @@ export class WalletController {
   })
   async transfer(@Req() req, @Body() transferDto: TransferDto) {
     const senderUserId = (req.user?.id || req.apiKey?.userId) as string;
+    if (!senderUserId) {
+        throw new BadRequestException('User context not found.');
+    }
     const { wallet_number, amount } = transferDto;
     return await this.walletService.transfer(
       senderUserId,

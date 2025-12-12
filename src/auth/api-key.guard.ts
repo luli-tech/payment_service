@@ -49,6 +49,7 @@ export class ApiKeyGuard implements CanActivate {
     const hashedApiKey = this.hashKey(apiKey);
     const keyRecord = await this.prisma.apiKey.findUnique({
       where: { key: hashedApiKey },
+      include: { user: true },
     });
     if (!keyRecord) {
       throw new UnauthorizedException('Invalid API key');
@@ -77,6 +78,9 @@ export class ApiKeyGuard implements CanActivate {
     // attach to request for downstream use
 
     (request as any).apiKey = keyRecord;
+    if (keyRecord.user) {
+      (request as any).user = keyRecord.user;
+    }
     return true;
   }
 }
